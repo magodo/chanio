@@ -8,7 +8,7 @@ type ChanIO chan byte
 
 var _ io.ReadWriteCloser = make(ChanIO)
 
-func Pipe() (io.Reader, io.WriteCloser, error) {
+func Pipe() (io.ReadCloser, io.WriteCloser, error) {
 	ch := make(ChanIO)
 	return ch, ch, nil
 }
