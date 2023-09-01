@@ -1,6 +1,6 @@
-# chainio
+# chanio
 
-`chainio` is a Go library for treating a channel as `io.Reader`, `io.Writer` and `io.Closer`. The main motivation is to mimic the `os.Pipe()` function in WASM environment.
+`chanio` is a Go library for treating a channel as `io.Reader`, `io.Writer` and `io.Closer`. The main motivation is to mimic the `os.Pipe()` function in WASM environment.
 
 ## About the Name
 
