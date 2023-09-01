@@ -20,26 +20,21 @@ func (ch ChanIO) Read(p []byte) (n int, err error) {
 	}
 	var cnt int
 	var buf []byte
-Loop:
 	for {
 		if cnt == size {
+			copy(p, buf)
 			return cnt, nil
 		}
-		select {
-		case b, ok := <-ch:
-			if ok {
-				buf = append(buf, b)
-				cnt++
-				continue
-			}
-			copy(p, buf)
-			return cnt, io.EOF
-		default:
-			break Loop
+		b, ok := <-ch
+		if ok {
+			buf = append(buf, b)
+			cnt++
+			continue
 		}
+		// channel is closed
+		copy(p, buf)
+		return cnt, io.EOF
 	}
-	copy(p, buf)
-	return cnt, nil
 }
 
 func (c ChanIO) Write(p []byte) (n int, err error) {
