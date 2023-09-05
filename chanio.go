@@ -18,45 +18,38 @@ func (ch ChanIO) Read(p []byte) (n int, err error) {
 	if size == 0 {
 		return 0, nil
 	}
-	var cnt int
-	var buf []byte
-	var unblk bool
+
+	// First read from channel that might block.
+	b, ok := <-ch
+	if !ok {
+		return 0, io.EOF
+	}
+
+	buf := []byte{b}
+	cnt := 1
+
 	for {
 		if cnt == size {
 			copy(p, buf)
 			return cnt, nil
 		}
 
-		if unblk {
-			// Non-first read from channel, which should continue until blocked/channel closed.
-			select {
-			case b, ok := <-ch:
-				if ok {
-					buf = append(buf, b)
-					cnt++
-					continue
-				}
-				// channel is closed
-				copy(p, buf)
-				return cnt, io.EOF
-			default:
-				// short read
-				copy(p, buf)
-				return cnt, nil
+		// Non-first read from channel, which should continue until blocked/channel closed.
+		select {
+		case b, ok := <-ch:
+			if ok {
+				buf = append(buf, b)
+				cnt++
+				continue
 			}
+			// channel is closed
+			copy(p, buf)
+			return cnt, io.EOF
+		default:
+			// short read
+			copy(p, buf)
+			return cnt, nil
 		}
-
-		// First read from channel that might block.
-		b, ok := <-ch
-		if ok {
-			unblk = true
-			buf = append(buf, b)
-			cnt++
-			continue
-		}
-		// channel is closed
-		copy(p, buf)
-		return cnt, io.EOF
 	}
 }
 
