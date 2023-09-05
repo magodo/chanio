@@ -29,7 +29,8 @@ func (ch ChanIO) Read(p []byte) (n int, err error) {
 		if ok {
 			buf = append(buf, b)
 			cnt++
-			continue
+			copy(p, buf)
+			return cnt, nil
 		}
 		// channel is closed
 		copy(p, buf)
